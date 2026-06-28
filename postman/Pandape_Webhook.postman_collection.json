@@ -1,0 +1,76 @@
+{
+  "info": {
+    "name": "Pandape Webhook Receiver",
+    "_postman_id": "pandape-webhook-collection",
+    "description": "Coleção para testar o Pandape Webhook Receiver hospedado no Render.\n\n**Ordem de execução:**\n1. Get Bearer Token\n2. Send Webhook (Pandape)\n3. Health Check",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "base_url", "value": "https://pandape-webhook.onrender.com", "type": "string" },
+    { "key": "client_id", "value": "SEU_CLIENT_ID", "type": "string" },
+    { "key": "client_secret", "value": "SEU_CLIENT_SECRET", "type": "string" },
+    { "key": "access_token", "value": "", "type": "string" }
+  ],
+  "item": [
+    {
+      "name": "1. Get Bearer Token",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "var json = pm.response.json();",
+              "if (json.access_token) {",
+              "  pm.collectionVariables.set('access_token', json.access_token);",
+              "  console.log('Token salvo:', json.access_token.substring(0, 20) + '...');",
+              "}"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [],
+        "auth": {
+          "type": "basic",
+          "basic": [
+            { "key": "username", "value": "{{client_id}}", "type": "string" },
+            { "key": "password", "value": "{{client_secret}}", "type": "string" }
+          ]
+        },
+        "url": { "raw": "{{base_url}}/oauth/token", "host": ["{{base_url}}"], "path": ["oauth", "token"] },
+        "description": "Solicita um Bearer token usando Basic Auth.\nO Pandape faz exatamente isso antes de cada envio de webhook."
+      }
+    },
+    {
+      "name": "2. Send Webhook (Pandape)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "auth": {
+          "type": "bearer",
+          "bearer": [{ "key": "token", "value": "{{access_token}}", "type": "string" }]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"event\": \"candidato.inscrito\",\n  \"candidato\": {\n    \"id\": 12345,\n    \"nome\": \"João Silva\",\n    \"email\": \"joao@exemplo.com\"\n  },\n  \"vaga\": {\n    \"id\": 99,\n    \"titulo\": \"Desenvolvedor Backend\"\n  }\n}",
+          "options": { "raw": { "language": "json" } }
+        },
+        "url": { "raw": "{{base_url}}/webhook/pandape", "host": ["{{base_url}}"], "path": ["webhook", "pandape"] },
+        "description": "Simula o envio de um webhook pelo Pandape com Bearer token.\nExecute DEPOIS do passo 1 — o token é preenchido automaticamente."
+      }
+    },
+    {
+      "name": "3. Health Check",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": { "raw": "{{base_url}}/health", "host": ["{{base_url}}"], "path": ["health"] },
+        "description": "Verifica se o serviço está no ar. Usado pelo UptimeRobot a cada 5 min."
+      }
+    }
+  ]
+}

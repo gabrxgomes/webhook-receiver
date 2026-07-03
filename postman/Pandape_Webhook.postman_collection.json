@@ -6,7 +6,7 @@
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
-    { "key": "base_url", "value": "https://pandape-webhook.onrender.com", "type": "string" },
+    { "key": "base_url", "value": "https://webhook-receiver-v18x.onrender.com", "type": "string" },
     { "key": "client_id", "value": "SEU_CLIENT_ID", "type": "string" },
     { "key": "client_secret", "value": "SEU_CLIENT_SECRET", "type": "string" },
     { "key": "access_token", "value": "", "type": "string" }

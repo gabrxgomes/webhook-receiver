@@ -52,17 +52,15 @@ gh repo create pandape-webhook --public --source=. --remote=origin --push
 6. Clique em **Create Web Service**.
 7. Aguarde o build terminar (cerca de 1-2 min). Ao final, sua URL será:
    ```
-   https://pandape-webhook-XXXX.onrender.com
+   https://webhook-receiver-v18x.onrender.com
    ```
 
 ---
 
 ## 3. Verifique o deploy
 
-Abra o terminal e substitua a URL pela sua:
-
 ```bash
-curl https://pandape-webhook-XXXX.onrender.com/health
+curl https://webhook-receiver-v18x.onrender.com/health
 ```
 
 Resposta esperada:
@@ -84,10 +82,10 @@ preencha:
 |-------------------------------|----------------------------------------------------------------|
 | Nome                          | (qualquer nome descritivo)                                     |
 | Tipo de autorização           | **Token dinâmico**                                             |
-| URL do token                  | `https://pandape-webhook-XXXX.onrender.com/oauth/token`        |
+| URL do token                  | `https://webhook-receiver-v18x.onrender.com/oauth/token`       |
 | Client ID                     | valor de `CLIENT_ID` definido no Render                        |
 | Client Secret                 | valor de `CLIENT_SECRET` definido no Render                    |
-| URL de destino                | `https://pandape-webhook-XXXX.onrender.com/webhook/pandape`    |
+| URL de destino                | `https://webhook-receiver-v18x.onrender.com/webhook/pandape`   |
 | Escopo                        | Todas as vagas (ou selecione vagas específicas)                |
 | Eventos                       | Selecione os eventos desejados                                 |
 
@@ -115,7 +113,7 @@ faz um ping a cada 5 min para evitar isso.
    |--------------------|----------------------------------------------------------|
    | Monitor Type       | `HTTP(s)`                                                |
    | Friendly Name      | `Pandape Webhook`                                        |
-   | URL                | `https://pandape-webhook-XXXX.onrender.com/health`       |
+   | URL                | `https://webhook-receiver-v18x.onrender.com/health`      |
    | Monitoring Interval| `5 minutes`                                              |
 
 3. Clique em **Create Monitor**.

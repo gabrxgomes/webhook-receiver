@@ -92,6 +92,51 @@ def verify_bearer_token(req):
         return None
 
 
+def mask_secret(value, keep=4):
+    if not value:
+        return value
+    if len(value) <= keep * 2:
+        return "*" * len(value)
+    return f"{value[:keep]}...{value[-keep:]}"
+
+
+def log_token_request(req):
+    content_type = req.content_type or ""
+    auth_header = req.headers.get("Authorization", "")
+
+    print(flush=True)
+    print("=" * 60, flush=True)
+    log("TOKEN REQUEST RECEBIDO [OAUTH]")
+    print(f"  Method      : {req.method}", flush=True)
+    print(f"  Content-Type: {content_type}", flush=True)
+    if auth_header:
+        scheme, _, value = auth_header.partition(" ")
+        print(f"  Authorization: {scheme} {mask_secret(value)}", flush=True)
+    print(flush=True)
+
+    if req.form:
+        print("  --- Form data (x-www-form-urlencoded) ---", flush=True)
+        for key, value in req.form.items():
+            shown = mask_secret(value) if key == "client_secret" else value
+            print(f"    {key} = {shown}", flush=True)
+
+    json_body = req.get_json(silent=True)
+    if json_body:
+        masked = dict(json_body)
+        if "client_secret" in masked:
+            masked["client_secret"] = mask_secret(masked["client_secret"])
+        print("  --- Body (JSON) ---", flush=True)
+        print(json.dumps(masked, indent=2, ensure_ascii=False), flush=True)
+
+    if not req.form and not json_body:
+        raw = req.get_data(as_text=True)
+        print("  --- Raw body ---", flush=True)
+        print(f"  {raw[:2000]}", flush=True)
+
+    print("=" * 60, flush=True)
+    print(flush=True)
+
+
 def log_webhook(req, label):
     content_type = req.content_type or ""
     try:
@@ -128,6 +173,7 @@ def issue_token():
       - HTTP Basic Auth header
       - JSON body: {"client_id": "...", "client_secret": "..."}
     """
+    log_token_request(request)
     client_id, client_secret = extract_client_credentials(request)
 
     if not credentials_valid(client_id, client_secret):
